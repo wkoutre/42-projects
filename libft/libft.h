@@ -99,5 +99,6 @@ char					*ft_strsub(char const *s, unsigned int start,\
 char					*ft_strjoin(char const *s1, char const *s2);
 char					*ft_itoa(int n);
 char					*ft_strtrim(char const *s);
+char			 		*ft_strdouble(char *str);
 
 #endif

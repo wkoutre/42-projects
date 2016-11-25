@@ -84,7 +84,8 @@ C_FILES =	ft_memset.c \
 			ft_lstiter.c \
 			ft_lstmap.c \
 			ft_isupper.c \
-			ft_islower.c
+			ft_islower.c \
+			ft_strdouble.c \
 
 SOURCES = $(addprefix $(SRC_DIR), $(C_FILES))
 
