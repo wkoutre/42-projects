@@ -23,6 +23,6 @@ typedef struct		s_glist
 }					t_glist;
 
 int			get_next_line(const int fd, char **line);
-t_glist 	*new_glist(size_t size, const int fd/*, int b*/);
+t_glist 	*new_glist(size_t size, const int fd, int b);
 
 #endif
