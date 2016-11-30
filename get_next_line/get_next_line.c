@@ -12,6 +12,13 @@
 
 #include "get_next_line.h"
 
+/*
+** This function keeps track of a SINGLE file descriptor, returning the next
+** line of the file or input each time it is run WITHIN THE SAME PROGRAM.
+** If the program ends, the thread will be lost and the first line will be
+** assigned to "line" the next time "get_next_line" is called.
+*/
+
 t_glist			*new_glist(size_t size, const int fd, int b)
 {
 	t_glist	*node;
@@ -29,6 +36,11 @@ t_glist			*new_glist(size_t size, const int fd, int b)
 		return (node);
 	}
 }
+
+/*
+** The main loop for when the end of the buffer is not reached. Returns 1
+** if a new line is reached. Otherwise, it iterates through the buffer.
+*/
 
 static int		loop_read(t_glist **list, char ***line)
 {
@@ -48,6 +60,14 @@ static int		loop_read(t_glist **list, char ***line)
 	return (0);
 }
 
+/*
+** The function for when the end of a buffer is reached. If so, it reads
+** the next part of the fd with # of bytes == BUFF_SIZE.
+** IF there's nothing left to read ('read' returns 0 bytes) AND
+** list->i > 0, this means the end of the file has been reached.
+** This will only return 1 when the end of the file has been reached.
+*/
+
 static int		end_read(t_glist **list, char ***line)
 {
 	if ((*list)->buf[(*list)->b] == '\0')
@@ -64,6 +84,15 @@ static int		end_read(t_glist **list, char ***line)
 	}
 	return (0);
 }
+
+/*
+** The main function which sets the list correctly depending on if there is
+** a pre-existing thread. If there is, it will start from that thread. If not,
+** a new list will be created (new str allocation, new buffer, has fd == the
+** parameter).
+**
+** NEED TO ADD: Reading from multiple file descriptors in the same program.
+*/
 
 int				get_next_line(const int fd, char **line)
 {
