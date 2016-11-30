@@ -1,5 +1,10 @@
 #include "get_next_line.h"
 
+/*
+* REMEMBER TO CHANGE T_GLIST IN HEADER FILE
+* DOESN'T WORK WITH MOULINETTE TEST
+*/
+
 t_glist 	*new_glist(size_t size, const int fd, int b)
 {
 	t_glist	*node;
