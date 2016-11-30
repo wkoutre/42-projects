@@ -108,9 +108,10 @@ int	get_next_line(const int fd, char **line)
 	return (0);
 }
 
-/*int	main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	int 	fd;
+	/*int 	fd2;*/
 	char	*line;
 
 	if (argc > 1)
@@ -120,10 +121,18 @@ int	get_next_line(const int fd, char **line)
 		{
 			printf("LINE = %s\n", line);
 		}
+		/*get_next_line(fd, &line);
+		printf("LINE = %s\n", line);
+		fd2 = open("2file", O_RDONLY);
+		get_next_line(fd2, &line);
+		printf("LINE 2 = %s\n", line);
+		get_next_line(fd, &line);
+		printf("LINE = %s\n", line);
+		get_next_line(fd, &line);
+		printf("LINE = %s\n", line);*/
 		close(fd);
 		return (0);
 	}
 	else	
 		return (0);
 }
-*/
