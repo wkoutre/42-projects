@@ -20,6 +20,8 @@ clang -Wall -Wextra -Werror -I libft/includes -o get_next_line.o -c get_next_lin
 
 YOU WILL NOW HAVE THE EXECUTABLE CALLED “test_gnl” WITH WHICH TO TEST OUTPUT. MANY TESTING TEXT FILES ARE LOCATED IN THE “testing_files” DIRECTORY.
 
+———————
+
 e.g.
 
 ./test_gnl testing_files/file
