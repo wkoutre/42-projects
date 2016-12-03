@@ -10,6 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+/*
+** Allocates (with malloc(3)) and returns a “fresh” string end- ing with ’\0’,
+** result of the concatenation of s1 and s2. If the allocation fails the
+** function returns NULL.
+*/
+
 #include "libft.h"
 
 char	*ft_strjoin(char const *s1, char const *s2)

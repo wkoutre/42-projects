@@ -1,30 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strclr.c                                        :+:      :+:    :+:   */
+/*   ft_isnewline.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkoutrel <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/01 21:09:58 by nkoutrel          #+#    #+#             */
-/*   Updated: 2016/11/01 21:10:03 by nkoutrel         ###   ########.fr       */
+/*   Created: 2016/11/22 18:07:33 by nkoutrel          #+#    #+#             */
+/*   Updated: 2016/11/22 18:08:14 by nkoutrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
-** Sets every character of the string to the value ’\0’.
-*/
-
 #include "libft.h"
 
-void	ft_strclr(char *s)
+int		ft_isnewline(char c)
 {
-	int i;
-
-	i = 0;
-	if (s)
-		while (s[i])
-		{
-			s[i] = '\0';
-			i++;
-		}
+	if (c == '\n')
+		return (1);
+	else
+		return (0);
 }

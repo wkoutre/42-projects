@@ -4,17 +4,30 @@ int	main(int argc, char **argv)
 {
 	int 	fd;
 	char	*line;
+	int 	ret;
 
-	if (argc > 1)
+	(void)argc;
+	fd = open(argv[1], O_RDONLY);
+	/*printf("return = %d\n", get_next_line(fd, &line));
+	printf("LINE = %s\n", line);
+	return (0);*/
+	while (1)
 	{
-		fd = open(argv[1], O_RDONLY);
-		while (get_next_line(fd, &line))
+		ret = get_next_line(fd, &line);
+		if (ret > 0)
+			printf("%s\n", line);
+		if (ret == 0)
 		{
-			printf("LINE = %s\n", line);
+			printf("----------\nClosing...\n");
+			close(fd);
+			return (0);
 		}
-		close(fd);
-		return (0);
+		if (ret < 0)
+		{
+			printf("Error. Return value of %d\n", ret);
+			return (ret);
+		}
 	}
-	else	
-		return (0);
+	close(fd);
+	return (0);
 }

@@ -5,120 +5,115 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkoutrel <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/30 14:02:03 by nkoutrel          #+#    #+#             */
-/*   Updated: 2016/11/30 14:02:04 by nkoutrel         ###   ########.fr       */
+/*   Created: 2016/12/02 19:26:08 by nkoutrel          #+#    #+#             */
+/*   Updated: 2016/12/02 19:26:09 by nkoutrel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-/*
-** This function keeps track of a SINGLE file descriptor, returning the next
-** line of the file or input each time it is run WITHIN THE SAME PROGRAM.
-** If the program ends, the thread will be lost and the first line will be
-** assigned to "line" the next time "get_next_line" is called.
-*/
+static char			*put_line(t_glist *list, char **line)
+{
+	char	*tmp;
+	char	*copy;
+	int		i;
 
-t_glist			*new_glist(size_t size, const int fd, int b)
+	tmp = NULL;
+	i = 0;
+	copy = list->str;
+	while (copy[i])
+	{
+		if (copy[i] == '\n')
+		{
+			*line = ft_strsub(copy, 0, i);
+			tmp = copy;
+			copy = ft_strdup(copy + (i + 1));
+			free(tmp);
+			return (copy);
+		}
+		i++;
+	}
+	*line = ft_strdup(copy);
+	ft_strclr(copy);
+	ft_strclr(list->str);
+	return (copy);
+}
+
+static int			read_line(int fd, t_glist *list)
+{
+	char	*tmp;
+	int		ret;
+	char	buf[BUFF_SIZE + 1];
+
+	tmp = NULL;
+	ret = -2;
+	while (!ft_strchr(list->str, '\n'))
+	{
+		if ((ret = read(fd, buf, BUFF_SIZE)) < 0)
+			return (-1);
+		else
+		{
+			buf[ret] = '\0';
+			tmp = list->str;
+			if (!(list->str = ft_strjoin(list->str, buf)))
+				return (-1);
+			free(tmp);
+		}
+		if (ret < BUFF_SIZE)
+			return (ret);
+	}
+	return (ret);
+}
+
+static void			add_list(t_glist *list, t_glist *new)
+{
+	while (list)
+	{
+		if (list->next == NULL)
+		{
+			list->next = new;
+			new->next = NULL;
+		}
+		list = list->next;
+	}
+}
+
+static t_glist		*new_glist(const int fd)
 {
 	t_glist	*node;
 
 	if (!(node = (t_glist *)malloc(sizeof(t_glist))))
 		return (NULL);
-	else
-	{
-		node->str = ft_strnew(size);
-		node->i = 0;
-		node->next = NULL;
-		node->fd = fd;
-		node->b = b;
-		node->ret = -2;
-		return (node);
-	}
+	node->fd = fd;
+	node->str = ft_strnew(0);
+	node->next = NULL;
+	return (node);
 }
 
-/*
-** The main loop for when the end of the buffer is not reached. Returns 1
-** if a new line is reached. Otherwise, it iterates through the buffer.
-*/
-
-static int		loop_read(t_glist **list, char ***line)
+int					get_next_line(const int fd, char **line)
 {
-	if ((*list)->buf[(*list)->b] != '\n')
-	{
-		(*list)->str[(*list)->i++] = (*list)->buf[(*list)->b++];
-		if ((*list)->str[(*list)->i] == '\0')
-			(*list)->str = ft_strdouble((*list)->str);
-	}
-	if ((*list)->buf[(*list)->b] == '\n')
-	{
-		(*list)->str[(*list)->i] = '\0';
-		(*list)->b++;
-		**line = (*list)->str;
-		return (1);
-	}
-	return (0);
-}
+	static t_glist	*head;
+	t_glist			*list;
+	int				ret;
 
-/*
-** The function for when the end of a buffer is reached. If so, it reads
-** the next part of the fd with # of bytes == BUFF_SIZE.
-** IF there's nothing left to read ('read' returns 0 bytes) AND
-** list->i > 0, this means the end of the file has been reached.
-** This will only return 1 when the end of the file has been reached.
-*/
-
-static int		end_read(t_glist **list, char ***line)
-{
-	if ((*list)->buf[(*list)->b] == '\0')
-	{
-		(*list)->b = 0;
-		(*list)->ret = read((*list)->fd, (*list)->buf, BUFF_SIZE);
-		(*list)->buf[(*list)->ret] = '\0';
-		if ((*list)->ret == 0 && (*list)->i > 0)
-		{
-			(*list)->str[(*list)->i] = '\0';
-			**line = (*list)->str;
-			return (1);
-		}
-	}
-	return (0);
-}
-
-/*
-** The main function which sets the list correctly depending on if there is
-** a pre-existing thread. If there is, it will start from that thread. If not,
-** a new list will be created (new str allocation, new buffer, has fd == the
-** parameter).
-**
-** NEED TO ADD: Reading from multiple file descriptors in the same program.
-*/
-
-int				get_next_line(const int fd, char **line)
-{
-	static t_glist		*list;
-
-	if (fd < 0 || BUFF_SIZE <= 0)
+	if (!head)
+		head = new_glist(fd);
+	list = head;
+	if (fd < 0 || !line)
 		return (-1);
-	if (list && list->buf[list->b])
+	while (list)
 	{
-		list->str = ft_strnew(BUFF_SIZE);
-		list->i = 0;
+		if (list->fd == fd)
+			break ;
+		if (list->next == NULL)
+			add_list(list, new_glist(fd));
+		list = list->next;
 	}
+	if ((ret = read_line(fd, list)) == -1)
+		return (-1);
+	list->str = put_line(list, line);
+	if (!ft_strlen(list->str) && !ft_strlen(*line) && !ret)
+		return (0);
 	else
-	{
-		list = new_glist(BUFF_SIZE, fd, 0);
-		list->ret = read(fd, list->buf, BUFF_SIZE);
-		if (list->ret == -1)
-			return (-1);
-		list->buf[list->ret] = '\0';
-	}
-	while (list->ret != 0)
-	{
-		if (loop_read(&list, &line) == 1)
-			return (1);
-		if (end_read(&list, &line) == 1)
-			return (1);
-	}
-	return (0);
+		return (1);
 }
